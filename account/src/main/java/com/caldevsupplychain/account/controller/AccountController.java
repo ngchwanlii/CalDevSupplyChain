@@ -119,7 +119,12 @@ public class AccountController {
         // success on checking, create user
         User user = accountService.createUser(userWS);
 
+        log.warn("CREATE USER SUCCESS");
+
         emailService.sendRegistrationVerificationTokenEmail(user.getEmailAddress(), user.getToken(), request);
+
+
+        log.warn("SENDING EMAIL ACTIVATION TOKEN");
 
         return new ResponseEntity<>(accountWSBuilder.buildUserWS(user), HttpStatus.CREATED);
     }
@@ -135,6 +140,8 @@ public class AccountController {
 
         // validated token -> login user
         accountService.activateUser(user.get().getId());
+
+        log.warn("USER ACTIVATED");
 
         return new ResponseEntity<>(accountWSBuilder.buildUserWS(user.get()), HttpStatus.OK);
     }
@@ -161,9 +168,15 @@ public class AccountController {
                 subject.login(token);
             }
             catch (AuthenticationException e) {
+
+                log.warn("USER LOGIN FAIL");
+
                 return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.LOGIN_INVALID.name(), e.getMessage()), HttpStatus.UNAUTHORIZED);
             }
         }
+
+
+        log.warn("USER LOGIN SUCCESS");
 
         // success login -> return JSON object
         return new ResponseEntity<>(accountWSBuilder.buildUserWS(user.get()), HttpStatus.OK);
@@ -177,8 +190,13 @@ public class AccountController {
         Optional<User> user = accountService.findByUuid(subject.getPrincipal().toString());
 
         if(!user.isPresent()){
+
+            log.warn("USER LOGOUT FAIL");
+
             return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.LOGOUT_INVALID.name(), "Logout Invalid"), HttpStatus.BAD_REQUEST);
         }
+
+        log.warn("USER LOGOUT SUCCESS");
 
         // logout
         subject.logout();
@@ -192,11 +210,14 @@ public class AccountController {
     public ResponseEntity<?> getUserByEmailAddress(@RequestParam String emailAddress) {
         Optional<User> user = accountService.findByEmailAddress(emailAddress);
         if (!user.isPresent()) {
+
+            log.warn("GET USER BY EMAIL FAIL");
+
             return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_NOT_EXIST.name(), "Get user from email address failed."), HttpStatus.NOT_FOUND);
         }
 
-        // TODO delete
-        log.warn("success getUserByEmailAddress");
+
+        log.warn("GET USER BY EMAIL SUCCESS");
 
         return new ResponseEntity<>(accountWSBuilder.buildUserWS(user.get()), HttpStatus.OK);
     }
@@ -210,6 +231,9 @@ public class AccountController {
         Optional<User> user = accountService.findByUuid(uuid);
 
         if (!user.isPresent()) {
+
+            log.warn("EDIT USER FAIL");
+
             return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_NOT_EXIST.name(), "Cannot find account."), HttpStatus.NOT_FOUND);
         }
 
@@ -223,7 +247,7 @@ public class AccountController {
         );
 
 
-        log.warn("SUCCESSFULLY EDIT");
+        log.warn("EDIT USER SUCCESS");
 
         return new ResponseEntity<>(accountWSBuilder.buildUserWS(updatedUser), HttpStatus.OK);
     }

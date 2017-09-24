@@ -47,11 +47,10 @@ public class SecurityConfig {
     @Bean
     public ShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-        // use permissive to NOT require authentication, our controller Annotations will decide that
         chainDefinition.addPathDefinition("/api/account/v1/login", "authc");
+        chainDefinition.addPathDefinition("/api/account/v1/signup/**", "anon");
+        chainDefinition.addPathDefinition("/api/account/v1/users/**", "authc");
         return chainDefinition;
     }
-
-
 
 }

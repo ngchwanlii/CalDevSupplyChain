@@ -43,7 +43,9 @@ public class AccountServiceImpl implements AccountService {
          user.setToken(UUID.randomUUID().toString());
 
          // TODO: Roles or CompanyName maybe in different signup flow? Ex: detailSignupForm will update these 2 properties
+        // TODO: should use list to add all possible roles
          user.setRoles(Sets.newHashSet(new Role(userWS.getRole())));
+
          Optional.ofNullable(userWS.getCompanyName()).ifPresent(c -> user.setCompany(new Company(c)));
          userRepository.save(user);
          return user;
@@ -58,6 +60,9 @@ public class AccountServiceImpl implements AccountService {
         user.setUsername(username);
         user.setEmailAddress(emailAddress);
         user.setPassword(passwordService.encryptPassword(password));
+
+        // TODO: here
+
         user.setRoles(Sets.newHashSet(new Role(role)));
 
         log.warn("CANT THIS EXECUTE?");
