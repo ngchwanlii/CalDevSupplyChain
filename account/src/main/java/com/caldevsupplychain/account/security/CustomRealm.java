@@ -1,10 +1,11 @@
 package com.caldevsupplychain.account.security;
 
-import com.caldevsupplychain.account.model.User;
-import com.caldevsupplychain.account.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.*;
-import org.apache.shiro.authc.credential.DefaultPasswordService;
+
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -13,7 +14,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static java.util.stream.Collectors.toList;
+import com.caldevsupplychain.account.model.User;
+import com.caldevsupplychain.account.repository.UserRepository;
 
 @Slf4j
 @Component
@@ -52,12 +54,12 @@ public class CustomRealm extends AuthorizingRealm {
 
             SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
             // build authroization info
-            user.getRoles().forEach(role -> {
-                // add user role
-                info.addRole(role.getName());
-                // convert each users' role permission to Collection<String> permissions
-                info.addStringPermissions(role.getPermissions().stream().map(p -> p.toString()).collect(toList()) );
-            });
+//            user.getRoles().forEach(role -> {
+//                // add user role
+//                info.addRole(role.getName());
+//                // convert each users' role permission to Collection<String> permissions
+//                //info.addStringPermissions(role.getPermissions().stream().map(p -> p.toString()).collect(toList()) );
+//            });
             return info;
         }
         return null;

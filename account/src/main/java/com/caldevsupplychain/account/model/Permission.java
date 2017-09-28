@@ -1,24 +1,35 @@
 package com.caldevsupplychain.account.model;
 
 
-import lombok.Data;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import javax.persistence.*;
-import java.util.Collection;
-import java.util.Set;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import com.caldevsupplychain.account.vo.PermissionName;
 
 @Data
 @Entity
+@NoArgsConstructor
 @Table(name = "permissions")
 public class Permission {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(name = "permission_name", nullable = false)
-    String name;
+	@Column(name = "name")
+	@Enumerated(EnumType.STRING)
+	private PermissionName name;
 
-    @ManyToMany(mappedBy = "permissions", cascade = CascadeType.ALL)
-    Collection<Role> roles;
+	Permission(String name) {
+		this.name = PermissionName.valueOf(name);
+	}
 }

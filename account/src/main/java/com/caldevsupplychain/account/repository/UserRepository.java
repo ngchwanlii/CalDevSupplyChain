@@ -1,16 +1,17 @@
 package com.caldevsupplychain.account.repository;
 
 
-import com.caldevsupplychain.account.model.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
+
+import com.caldevsupplychain.account.model.User;
 
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 
-    User findByUuid(String uuid);
+	User findByUuid(String uuid);
 
-    User findByUsername(String username);
+	User findByUsername(String username);
 
-    User findByEmailAddress(String emailAddress);
+	User findByEmailAddress(String emailAddress);
 
-    User findByToken(String token);
+	User findByToken(String token);
 }

@@ -1,11 +1,12 @@
 package com.caldevsupplychain.common.ws.account;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Getter;
 import lombok.Setter;
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 
 @Getter
@@ -23,8 +24,8 @@ public class UserWS implements Serializable {
 	/* TODO: wait for Calvin to confirm on UI side */
 	private String role;
 	private String companyName;
-	private LocalDateTime createdOn;
-	private LocalDateTime lastModified;
+	private Date createdOn;
+	private Date lastModified;
 
 }
 

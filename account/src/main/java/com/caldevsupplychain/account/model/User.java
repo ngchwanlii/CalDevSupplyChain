@@ -1,13 +1,23 @@
 package com.caldevsupplychain.account.model;
 
-import com.caldevsupplychain.common.entity.BaseEntity;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.*;
-import java.util.Collection;
-import java.util.Set;
-import java.util.UUID;
+import com.caldevsupplychain.common.entity.BaseEntity;
 
 @Data
 @Entity
@@ -34,14 +44,10 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "company_id", referencedColumnName = "id")
 	private Company company;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	@JoinTable(
-			name = "users_roles",
-			joinColumns = @JoinColumn(
-					name = "user_id", referencedColumnName = "id"),
-			inverseJoinColumns = @JoinColumn(
-					name = "role_id", referencedColumnName = "id"))
-	private Collection<Role> roles;
+	@ManyToMany
+	@JoinTable(name = "user_2_role", joinColumns = @JoinColumn(name = "user_id"),
+			inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private List<Role> roles = new ArrayList<>();
 
 	@PrePersist
 	@Override
@@ -49,5 +55,4 @@ public class User extends BaseEntity {
 		super.onCreate();
 		uuid = UUID.randomUUID().toString();
 	}
-
 }
