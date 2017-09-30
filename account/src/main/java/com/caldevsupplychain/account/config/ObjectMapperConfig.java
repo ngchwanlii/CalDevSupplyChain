@@ -1,13 +1,13 @@
 package com.caldevsupplychain.account.config;
 
-import org.modelmapper.ModelMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ModelMapperConfig {
+public class ObjectMapperConfig {
     @Bean
-    public ModelMapper modelMapper() {
-        return new ModelMapper();
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
     }
 }

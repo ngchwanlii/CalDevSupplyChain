@@ -1,7 +1,7 @@
 package com.caldevsupplychain.account.validator;
 
-import com.caldevsupplychain.account.dto.UserLoginDTO;
 import com.caldevsupplychain.common.type.ErrorCode;
+import com.caldevsupplychain.common.ws.account.UserWS;
 import org.apache.shiro.util.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -19,14 +19,14 @@ public class LoginValidator implements Validator {
 
     @Override
     public boolean supports(Class clazz) {
-        return UserLoginDTO.class.equals(clazz);
+        return UserWS.class.equals(clazz);
     }
 
     @Override
     public void validate(Object o, Errors errors){
-        UserLoginDTO userDTO = (UserLoginDTO) o;
+        UserWS userWS  = (UserWS) o;
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "emailAddress", ErrorCode.EMAIL_EMPTY.name(), "Please specify an email address.");
-        if(StringUtils.hasText(userDTO.getEmailAddress()) && !emailPattern.matcher(userDTO.getEmailAddress()).matches()){
+        if(StringUtils.hasText(userWS.getEmailAddress()) && !emailPattern.matcher(userWS.getEmailAddress()).matches()){
             errors.rejectValue( "emailAddress", ErrorCode.EMAIL_INVALID.name(), "Please enter a valid email address." );
         }
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", ErrorCode.PASSWORD_EMPTY.name(), "Please specify a password.");

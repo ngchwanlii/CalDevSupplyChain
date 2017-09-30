@@ -1,18 +1,8 @@
 package com.caldevsupplychain.account.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,10 +34,11 @@ public class User extends BaseEntity {
 	@JoinColumn(name = "company_id", referencedColumnName = "id")
 	private Company company;
 
-	@ManyToMany
+	@OneToMany(cascade = CascadeType.ALL)
 	@JoinTable(name = "user_2_role", joinColumns = @JoinColumn(name = "user_id"),
 			inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private List<Role> roles = new ArrayList<>();
+
 
 	@PrePersist
 	@Override

@@ -11,6 +11,9 @@ public enum ErrorCode {
 
     EMAIL_EMPTY,
     EMAIL_INVALID,
+    EMAIL_MESSAGING_EXCEPTION,
+
+    ROLE_EMPTY,
 
     INVALID_TOKEN,
 

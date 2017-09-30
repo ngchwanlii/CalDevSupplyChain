@@ -38,7 +38,7 @@ public class EmailUtil {
 
         String activationLinkButtonTitle = "Activate Account Confirmation Link";
         String requestURL = request.getRequestURL().toString();
-        String content = requestURL.substring(0, requestURL.lastIndexOf("/")) + "/activate?token=" + token;
+        String content = requestURL.substring(0, requestURL.lastIndexOf("/")) + "/activate/" + token;
         String activationLink = "<a href=\"" + content + "\">" + activationLinkButtonTitle + "</a>";
 
         return activationLink;

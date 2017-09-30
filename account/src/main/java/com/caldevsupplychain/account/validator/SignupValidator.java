@@ -1,7 +1,5 @@
 package com.caldevsupplychain.account.validator;
 
-import com.caldevsupplychain.account.controller.AccountController;
-import com.caldevsupplychain.account.dto.UserSignupDTO;
 import com.caldevsupplychain.common.type.ErrorCode;
 import com.caldevsupplychain.common.ws.account.UserWS;
 import org.apache.shiro.util.StringUtils;
@@ -21,15 +19,15 @@ public class SignupValidator implements Validator {
 
     @Override
     public boolean supports(Class clazz) {
-        return UserSignupDTO.class.equals(clazz);
+        return UserWS.class.equals(clazz);
     }
 
     @Override
     public void validate(Object o, Errors errors){
-        UserSignupDTO userDTO = (UserSignupDTO) o;
+        UserWS userWS = (UserWS) o;
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", ErrorCode.USERNAME_EMPTY.name(), "Please specify a username.");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "emailAddress", ErrorCode.EMAIL_EMPTY.name(), "Please specify an email address.");
-        if(StringUtils.hasText(userDTO.getEmailAddress()) && !emailPattern.matcher(userDTO.getEmailAddress()).matches()){
+        if(StringUtils.hasText(userWS.getEmailAddress()) && !emailPattern.matcher(userWS.getEmailAddress()).matches()){
             errors.rejectValue( "emailAddress", ErrorCode.EMAIL_INVALID.name(), "Please enter a valid email address." );
         }
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", ErrorCode.PASSWORD_EMPTY.name(), "Please specify a password.");

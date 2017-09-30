@@ -1,11 +1,13 @@
 package com.caldevsupplychain.account.config;
 
 
-import com.caldevsupplychain.account.security.CustomRealm;
+import com.caldevsupplychain.account.security.JpaRealm;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.credential.DefaultPasswordService;
 import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authc.credential.PasswordService;
+import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
@@ -32,9 +34,11 @@ public class SecurityConfig {
         credentialsMatcher.setPasswordService(passwordService());
 
         // configure into realm
-        CustomRealm customRealm = new CustomRealm();
-        customRealm.setCredentialsMatcher(credentialsMatcher);
-        return customRealm;
+        JpaRealm jpaRealm = new JpaRealm();
+        jpaRealm.setCredentialsMatcher(credentialsMatcher);
+        jpaRealm.setCachingEnabled(true);
+
+        return jpaRealm;
     }
 
     @Bean
@@ -47,10 +51,19 @@ public class SecurityConfig {
     @Bean
     public ShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-        chainDefinition.addPathDefinition("/api/account/v1/login", "authc");
-        chainDefinition.addPathDefinition("/api/account/v1/signup/**", "anon");
-        chainDefinition.addPathDefinition("/api/account/v1/users/**", "authc");
+//        chainDefinition.addPathDefinition("/api/account/v1/users/**", "authc, perms[account:*]");
+        chainDefinition.addPathDefinition("/api/account/v1/users/**", "authc, perms[account:update_user]");
+
+
+//        /account/** = authc
+
         return chainDefinition;
+    }
+
+
+    @Bean
+    public CacheManager cacheManager() {
+        return new MemoryConstrainedCacheManager();
     }
 
 }

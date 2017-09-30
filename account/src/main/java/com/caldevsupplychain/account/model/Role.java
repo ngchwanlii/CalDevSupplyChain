@@ -1,7 +1,9 @@
 package com.caldevsupplychain.account.model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,9 +27,6 @@ import com.caldevsupplychain.account.vo.RoleName;
 @NoArgsConstructor
 @Table(name = "roles")
 public class Role {
-	public Role(String name){
-		this.name = RoleName.valueOf(name);
-	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,4 +40,15 @@ public class Role {
 	@JoinTable(name = "role_2_permission", joinColumns = @JoinColumn(name = "role_id"),
 			inverseJoinColumns = @JoinColumn(name = "permission_id"))
 	private List<Permission> permissions = new ArrayList<>();
+
+
+	public Role(String name){
+		this.name = RoleName.valueOf(name);
+	}
+
+
+//	public void setPermissions(String role){
+//
+//	}
+
 }

@@ -19,9 +19,7 @@ public class UserWS implements Serializable {
 	private String uuid;
 	private String username;
 	private String emailAddress;
-	/* password & matchedPassword logic will be checked on front-end when user key in */
 	private String password;
-	/* TODO: wait for Calvin to confirm on UI side */
 	private String role;
 	private String companyName;
 	private Date createdOn;
