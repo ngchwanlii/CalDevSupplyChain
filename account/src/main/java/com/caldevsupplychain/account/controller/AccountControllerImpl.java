@@ -7,12 +7,13 @@ import com.caldevsupplychain.account.validator.EditUserValidator;
 import com.caldevsupplychain.account.validator.LoginValidator;
 import com.caldevsupplychain.account.validator.SignupValidator;
 import com.caldevsupplychain.common.bean.account.UserBean;
-import com.caldevsupplychain.common.exception.FormErrorsExceptionHandler;
+import com.caldevsupplychain.common.exception.ApiErrorsExceptionHandler;
 import com.caldevsupplychain.common.type.ErrorCode;
 import com.caldevsupplychain.common.ws.account.ApiErrorsWS;
 import com.caldevsupplychain.common.ws.account.ErrorWS;
 import com.caldevsupplychain.common.ws.account.UserWS;
 import com.caldevsupplychain.notification.mail.service.EmailService;
+import com.caldevsupplychain.notification.mail.type.EmailType;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -22,16 +23,13 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+import org.springframework.validation.BindException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.mail.MessagingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 import java.util.List;
 import java.util.Optional;
-
 
 
 @Slf4j
@@ -52,7 +50,7 @@ public class AccountControllerImpl implements AccountController {
     private EmailService emailService;
 
     /* exception handler for form fields and bind field errors together */
-    private FormErrorsExceptionHandler formErrorsExceptionHandler;
+    private ApiErrorsExceptionHandler apiErrorsExceptionHandler;
 
 
     /************************************************************************************************
@@ -60,19 +58,16 @@ public class AccountControllerImpl implements AccountController {
      ************************************************************************************************/
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup (
-            @RequestParam(required = false, defaultValue = "USER") String role,
-            @Validated @RequestBody UserWS userWS,
-            HttpServletRequest request,
-            BindingResult errors
-    )
-    {
+    public ResponseEntity<?> signup (@RequestParam(required = false, defaultValue = "USER") String role, @Validated @RequestBody UserWS userWS)  {
+
+        BindException errors = new BindException(userWS, "UserWS");
+
         // signup form validation
         signupValidator.validate(userWS, errors);
 
         if(errors.hasErrors()){
             log.error("ERROR IN SIGNUP VALIDATION");
-            List<ErrorWS> errorWSList = formErrorsExceptionHandler.generateErrorWSList(errors);
+            List<ErrorWS> errorWSList = apiErrorsExceptionHandler.generateErrorWSList(errors);
             return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
@@ -91,7 +86,7 @@ public class AccountControllerImpl implements AccountController {
         User user = accountService.createUser(userBean);
 
         try {
-            emailService.sendRegistrationVerificationTokenEmail(user.getEmailAddress(), user.getToken(), request);
+            emailService.sendVerificationTokenEmail(user.getEmailAddress(), user.getToken(), EmailType.REGISTRATION.name());
         } catch (MessagingException e) {
             return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.EMAIL_MESSAGING_EXCEPTION.name(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -99,29 +94,21 @@ public class AccountControllerImpl implements AccountController {
     }
 
     // update as a form
-    @RequiresPermissions("account:update_user")
+    @RequiresPermissions("account:update")
     @PostMapping("/users/{uuid}")
-    public ResponseEntity<?> updateUser(
-            @PathVariable("uuid") String uuid,
-            @RequestParam String role,
-            @Validated @RequestBody UserWS userWS,
-            BindingResult errors
-    )
-    {
+    public ResponseEntity<?> updateUser(@PathVariable("uuid") String uuid, @Validated @RequestBody UserWS userWS) {
 
-        // signup form validation
-        userWS.setRole(role);
+        BindException errors = new BindException(userWS, "UserWS");
 
         editUserValidator.validate(userWS, errors);
 
         if(errors.hasErrors()){
             log.error("ERROR IN EDIT USER VALIDATION");
-            List<ErrorWS> errorWSList = formErrorsExceptionHandler.generateErrorWSList(errors);
+            List<ErrorWS> errorWSList = apiErrorsExceptionHandler.generateErrorWSList(errors);
             return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         Optional<User> user = Optional.ofNullable(accountService.findByUuid(uuid));
-
 
         if (!user.isPresent()) {
             log.error("ERROR IN EDIT USER");
@@ -129,7 +116,6 @@ public class AccountControllerImpl implements AccountController {
         }
 
         // convert userWS to userBean
-        userWS.setRole(role);
         UserBean userBean = new UserBean(userWS);
 
         User updatedUser = accountService.updateUser(userBean);
@@ -154,14 +140,16 @@ public class AccountControllerImpl implements AccountController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Validated @RequestBody UserWS userWS, BindingResult errors) {
+    public ResponseEntity<?> login(@Validated @RequestBody UserWS userWS) {
+
+        BindException errors = new BindException(userWS, "UserWS");
 
         // signup form validation
         loginValidator.validate(userWS, errors);
 
         if(errors.hasErrors()){
             log.error("ERROR IN LOGIN VALIDATION");
-            List<ErrorWS> errorWSList = formErrorsExceptionHandler.generateErrorWSList(errors);
+            List<ErrorWS> errorWSList = apiErrorsExceptionHandler.generateErrorWSList(errors);
             return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
@@ -177,8 +165,9 @@ public class AccountControllerImpl implements AccountController {
         // Apache Shiro authentication check
         if(!subject.isAuthenticated()) {
 
-            UsernamePasswordToken token = new UsernamePasswordToken(userWS.getEmailAddress(), userWS.getPassword(), true);
+            UsernamePasswordToken token = new UsernamePasswordToken(userWS.getEmailAddress(), userWS.getPassword());
 
+            // TODO: rememberMe has bug, need to setup cache, rememberMe manager (need to look into details on later stage)
             try {
                 subject.login(token);
             }
@@ -194,6 +183,7 @@ public class AccountControllerImpl implements AccountController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
+
         Subject subject = SecurityUtils.getSubject();
 
         Optional<User> user = Optional.ofNullable(accountService.findByUuid(subject.getPrincipal().toString()));
@@ -212,8 +202,3 @@ public class AccountControllerImpl implements AccountController {
     }
 
 }
-
-
-
-
-

@@ -19,10 +19,10 @@ public class EmailTemplate extends BaseEntity {
 	@Column(name = "subject")
 	private String subject;
 
-	@Column(name = "toEmail")
+	@Column(name = "to_email")
 	private String toEmail;
 
-	@Column(name = "fromEmail")
+	@Column(name = "from_email")
 	private String fromEmail;
 
 	@Column(name = "content")
@@ -33,3 +33,4 @@ public class EmailTemplate extends BaseEntity {
 	private EmailType type;
 
 }
+

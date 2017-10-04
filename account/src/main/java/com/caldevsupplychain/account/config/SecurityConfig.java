@@ -11,10 +11,23 @@ import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.realm.text.TextConfigurationRealm;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
+import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
+import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
+import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.web.filter.DelegatingFilterProxy;
+
+import javax.servlet.DispatcherType;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 @Configuration
 public class SecurityConfig {
@@ -25,39 +38,60 @@ public class SecurityConfig {
     }
 
     @Bean
-    public Realm realm() {
-        // uses 'classpath:shiro-users.properties' by default
-//        PropertiesRealm realm = new PropertiesRealm();
+    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor() {
+        AuthorizationAttributeSourceAdvisor aasa = new AuthorizationAttributeSourceAdvisor();
+        aasa.setSecurityManager(securityManager());
+        return new AuthorizationAttributeSourceAdvisor();
+    }
 
-        // set credential matcher
+    @Bean(name = "shiroFilter")
+    public ShiroFilterFactoryBean shiroFilterFactoryBean() {
+        ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
+        shiroFilterFactoryBean.setSecurityManager(securityManager());
+
+        Map<String, String> filterChainDefinitionMap = new LinkedHashMap<>();
+        filterChainDefinitionMap.put("/api/account/v1/users/**", "authc");
+        shiroFilterFactoryBean.setFilterChainDefinitionMap(filterChainDefinitionMap);
+
+        return shiroFilterFactoryBean;
+    }
+
+    @Bean(name = "lifecycleBeanPostProcessor")
+    public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
+        return new LifecycleBeanPostProcessor();
+    }
+
+    @Bean
+    @DependsOn("lifecycleBeanPostProcessor")
+    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
+        DefaultAdvisorAutoProxyCreator daapc = new DefaultAdvisorAutoProxyCreator();
+        daapc.setProxyTargetClass(true);
+        return daapc;
+    }
+
+    @Bean(name = "credentialsMatcher")
+    public PasswordMatcher credentialsMatcher() {
         PasswordMatcher credentialsMatcher = new PasswordMatcher();
         credentialsMatcher.setPasswordService(passwordService());
+        return credentialsMatcher;
+    }
 
+    @Bean(name = "jpaRealm")
+    public JpaRealm jpaRealm() {
         // configure into realm
         JpaRealm jpaRealm = new JpaRealm();
-        jpaRealm.setCredentialsMatcher(credentialsMatcher);
+        jpaRealm.setCredentialsMatcher(credentialsMatcher());
         jpaRealm.setCachingEnabled(true);
-
         return jpaRealm;
+
     }
 
-    @Bean
-    public SecurityManager securityManager() {
-        SecurityManager securityManager = new DefaultSecurityManager(realm());
+    @Bean(name = "securityManager")
+    public DefaultWebSecurityManager securityManager() {
+        DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+        securityManager.setRealm(jpaRealm());
         SecurityUtils.setSecurityManager(securityManager);
         return securityManager;
-    }
-
-    @Bean
-    public ShiroFilterChainDefinition shiroFilterChainDefinition() {
-        DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-//        chainDefinition.addPathDefinition("/api/account/v1/users/**", "authc, perms[account:*]");
-        chainDefinition.addPathDefinition("/api/account/v1/users/**", "authc, perms[account:update_user]");
-
-
-//        /account/** = authc
-
-        return chainDefinition;
     }
 
 
@@ -66,4 +100,14 @@ public class SecurityConfig {
         return new MemoryConstrainedCacheManager();
     }
 
+    @Bean
+    public FilterRegistrationBean filterRegistrationBean() {
+        FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
+        // TODO: maybe delegating filter proxy set to true
+        filterRegistration.setFilter(new DelegatingFilterProxy("shiroFilter"));
+        filterRegistration.setEnabled(true);
+        filterRegistration.addUrlPatterns("/*");
+//        filterRegistration.setDispatcherTypes(DispatcherType.REQUEST);
+        return filterRegistration;
+    }
 }

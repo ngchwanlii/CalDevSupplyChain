@@ -41,14 +41,8 @@ public class Role {
 			inverseJoinColumns = @JoinColumn(name = "permission_id"))
 	private List<Permission> permissions = new ArrayList<>();
 
-
 	public Role(String name){
 		this.name = RoleName.valueOf(name);
 	}
-
-
-//	public void setPermissions(String role){
-//
-//	}
 
 }

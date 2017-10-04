@@ -10,13 +10,14 @@ import javax.servlet.http.HttpServletRequest;
 
 public interface AccountController {
 
-	ResponseEntity<?> signup (String role, UserWS userWS, HttpServletRequest request, BindingResult errors);
+	ResponseEntity<?> signup (String role, UserWS userWS);
+
+	ResponseEntity<?> updateUser(String uuid, UserWS userWS);
 
 	ResponseEntity<?> activateAccount(String token);
 
-	ResponseEntity<?> login(UserWS userWS, BindingResult errors);
+	ResponseEntity<?> login(UserWS userWS);
 
 	ResponseEntity<?> logout();
 
-	ResponseEntity<?> updateUser(String uuid, String role, UserWS userWS, BindingResult errors);
 }

@@ -8,7 +8,5 @@ import org.springframework.context.annotation.Configuration;
 //@Getter
 public class WebConfig {
 
-//    @Value("${app.url}")
-//    String url;
 
 }

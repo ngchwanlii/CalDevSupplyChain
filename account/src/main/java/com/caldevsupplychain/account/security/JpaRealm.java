@@ -9,6 +9,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.Authorizer;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class JpaRealm extends AuthorizingRealm {
+public class JpaRealm extends AuthorizingRealm implements Authorizer{
 
     @Autowired
     private AccountService accountService;
@@ -34,9 +35,9 @@ public class JpaRealm extends AuthorizingRealm {
     private PasswordService passwordService;
 
     public JpaRealm() {
-        setName("JpaRealm");
+        setName("jpaRealm");
     }
-    
+
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
 
         UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
@@ -62,14 +63,14 @@ public class JpaRealm extends AuthorizingRealm {
 
             user.getRoles().stream().distinct().forEach(role -> {
                 info.addRole(role.getName().toString());
-                Collection<String> permissions = role.getPermissions().stream().distinct().map(Object::toString).collect(Collectors.toList());
-                info.addStringPermissions(permissions);
-
+                info.addStringPermissions(role.getPermissions().stream().distinct().map(p -> p.getName().toString()).collect(Collectors.toList()));
             });
-
             return info;
         }
         return null;
     }
+
+
+
 
 }

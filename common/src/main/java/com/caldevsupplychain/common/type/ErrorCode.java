@@ -22,5 +22,7 @@ public enum ErrorCode {
 
     COMPANY_NAME_EMPTY,
 
+    // delete later for testing
+    PERMISSION_DENIED,
 
 }

@@ -1,13 +1,11 @@
 package com.caldevsupplychain.account.service;
 
 import com.caldevsupplychain.account.model.Company;
-import com.caldevsupplychain.account.model.Permission;
 import com.caldevsupplychain.account.model.Role;
 import com.caldevsupplychain.account.model.User;
 import com.caldevsupplychain.account.repository.PermissionRepository;
 import com.caldevsupplychain.account.repository.RoleRepository;
 import com.caldevsupplychain.account.repository.UserRepository;
-import com.caldevsupplychain.account.vo.PermissionName;
 import com.caldevsupplychain.account.vo.RoleName;
 import com.caldevsupplychain.common.bean.account.UserBean;
 import com.caldevsupplychain.common.type.ErrorCode;
@@ -70,26 +68,13 @@ public class AccountServiceImpl implements AccountService {
 	public User updateUser(UserBean userBean) {
 
 		User user = userRepository.findByEmailAddress(userBean.getEmailAddress());
-		Role role = roleRepository.findByName(RoleName.valueOf(userBean.getRole()));
-//		Permission permission = permissionRepository.findByName(PermissionName.ACCOUNT_READ);
-
 		Preconditions.checkState(user != null, ErrorCode.USER_NOT_FOUND.toString());
 
 		user.setUsername(userBean.getUsername());
 		user.setEmailAddress(userBean.getEmailAddress());
 		user.setPassword(passwordService.encryptPassword(userBean.getPassword()));
-		user.setRoles(Lists.newArrayList(role));
 		Optional<String> companyName = Optional.ofNullable(userBean.getCompanyName());
 		companyName.ifPresent(c -> user.setCompany(new Company(c)));
-
-
-//		role.setPermissions(Lists.newArrayList(permission));
-
-		System.out.println("SEE PERMISSION");
-		for(Permission p : role.getPermissions()){
-			System.out.println(p.getName().toString());
-		}
-
 		userRepository.save(user);
 		return user;
 	}
