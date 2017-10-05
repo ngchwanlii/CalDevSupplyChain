@@ -20,24 +20,24 @@ import java.util.regex.Pattern;
 @Slf4j
 public class EditUserValidator implements Validator {
 
-    @Autowired
-    private EmailValidator emailValidator;
+	@Autowired
+	private EmailValidator emailValidator;
 
-    @Override
-    public boolean supports(Class clazz) {
-        return UserWS.class.equals(clazz);
-    }
+	@Override
+	public boolean supports(Class clazz) {
+		return UserWS.class.equals(clazz);
+	}
 
-    @Override
-    public void validate(Object o, Errors errors){
-        UserWS userWS = (UserWS) o;
+	@Override
+	public void validate(Object o, Errors errors) {
+		UserWS userWS = (UserWS) o;
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", ErrorCode.USERNAME_EMPTY.name(), "Please update a username.");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "emailAddress", ErrorCode.EMAIL_EMPTY.name(), "Please update an email address.");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", ErrorCode.USERNAME_EMPTY.name(), "Please update a username.");
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "emailAddress", ErrorCode.EMAIL_EMPTY.name(), "Please update an email address.");
 
-        if(StringUtils.hasText(userWS.getEmailAddress()) && !emailValidator.matchEmailPattern(userWS.getEmailAddress())){
-            errors.rejectValue( "emailAddress", ErrorCode.EMAIL_INVALID.name(), "Please update a valid email address." );
-        }
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", ErrorCode.PASSWORD_EMPTY.name(), "Please update a password.");
-    }
+		if (StringUtils.hasText(userWS.getEmailAddress()) && !emailValidator.matchEmailPattern(userWS.getEmailAddress())) {
+			errors.rejectValue("emailAddress", ErrorCode.EMAIL_INVALID.name(), "Please update a valid email address.");
+		}
+		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", ErrorCode.PASSWORD_EMPTY.name(), "Please update a password.");
+	}
 }

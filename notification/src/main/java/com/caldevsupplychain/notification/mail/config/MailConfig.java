@@ -14,25 +14,25 @@ import java.util.Properties;
 @Configuration
 public class MailConfig {
 
-    @Autowired
-    Environment env;
+	@Autowired
+	Environment env;
 
-    @Bean
-    public JavaMailSender javaMailSender() {
+	@Bean
+	public JavaMailSender javaMailSender() {
 
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost("smtp.gmail.com");
-        mailSender.setUsername(env.getProperty("ADMIN_EMAIL_ADDRESS"));
-        mailSender.setPassword(env.getProperty("ADMIN_EMAIL_PASSWORD"));
-        mailSender.setPort(587);
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("smtp.gmail.com");
+		mailSender.setUsername(env.getProperty("ADMIN_EMAIL_ADDRESS"));
+		mailSender.setPassword(env.getProperty("ADMIN_EMAIL_PASSWORD"));
+		mailSender.setPort(587);
 
-        Properties properties = new Properties();
-        // for DEBUG
+		Properties properties = new Properties();
+		// for DEBUG
 //        properties.setProperty("mail.debug", "true");
-        properties.setProperty("mail.smtp.starttls.enable", "true");
-        mailSender.setJavaMailProperties(properties);
+		properties.setProperty("mail.smtp.starttls.enable", "true");
+		mailSender.setJavaMailProperties(properties);
 
-        return mailSender;
-    }
+		return mailSender;
+	}
 
 }

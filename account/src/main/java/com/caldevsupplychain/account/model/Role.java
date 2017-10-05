@@ -1,9 +1,7 @@
 package com.caldevsupplychain.account.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,7 +39,7 @@ public class Role {
 			inverseJoinColumns = @JoinColumn(name = "permission_id"))
 	private List<Permission> permissions = new ArrayList<>();
 
-	public Role(String name){
+	public Role(String name) {
 		this.name = RoleName.valueOf(name);
 	}
 

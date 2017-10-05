@@ -15,7 +15,7 @@ import com.caldevsupplychain.common.entity.BaseEntity;
 @Table(name = "users")
 public class User extends BaseEntity {
 
-    @Column(name = "uuid", nullable = false, unique = true, updatable = false)
+	@Column(name = "uuid", nullable = false, unique = true, updatable = false)
 	private String uuid;
 
 	@Column(name = "username", nullable = false)

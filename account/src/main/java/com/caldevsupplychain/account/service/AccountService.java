@@ -1,50 +1,22 @@
 package com.caldevsupplychain.account.service;
 
 
-
-import com.caldevsupplychain.account.model.Role;
-import com.caldevsupplychain.account.model.User;
-import com.caldevsupplychain.common.bean.account.UserBean;
-
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
+import com.caldevsupplychain.account.vo.UserBean;
 
 public interface AccountService {
+	boolean userExist(String emailAddress);
 
-    boolean userExist(String emailAddress);
+	UserBean createUser(UserBean userBean);
 
-    /****************************************************************
-     *                      User                                    *
-     ****************************************************************/
-    User createUser(UserBean userBean);
+	UserBean updateUser(UserBean userBean);
 
-    User updateUser(UserBean userBean);
+	void activateUser(long id);
 
-    void activateUser(long id);
+	Optional<UserBean> findByUuid(String uuid);
 
-    User findById(long id);
+	Optional<UserBean> findByEmailAddress(String emailAddress);
 
-    User findByUuid(String uuid);
-
-    User findByUsername(String username);
-
-    User findByEmailAddress(String emailAddress);
-
-    User findByToken(String token);
-
-
-    /****************************************************************
-     *                      Role                                    *
-     ****************************************************************/
-//    Set<Role> findUserRole(long id);
-
-
-
-
-    /****************************************************************
-     *                      Permission                              *
-     ****************************************************************/
-
-
+	Optional<UserBean> findByToken(String token);
 }

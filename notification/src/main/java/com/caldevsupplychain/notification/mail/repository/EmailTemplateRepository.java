@@ -5,6 +5,6 @@ import com.caldevsupplychain.notification.mail.type.EmailType;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface EmailTemplateRepository extends PagingAndSortingRepository<EmailTemplate, Long> {
-    EmailTemplate findByType(EmailType type);
+	EmailTemplate findByType(EmailType type);
 }
 

@@ -10,7 +10,7 @@ import java.util.Locale;
 
 @Data
 @Entity
-@EqualsAndHashCode(callSuper=true)
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "email_templates")
 public class EmailTemplate extends BaseEntity {
 	@Column(name = "locale", nullable = false)

@@ -1,25 +1,26 @@
 package com.caldevsupplychain.account.service;
 
-import com.caldevsupplychain.account.model.Company;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.transaction.Transactional;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.shiro.authc.credential.PasswordService;
+import org.springframework.stereotype.Service;
+
 import com.caldevsupplychain.account.model.Role;
 import com.caldevsupplychain.account.model.User;
 import com.caldevsupplychain.account.repository.PermissionRepository;
 import com.caldevsupplychain.account.repository.RoleRepository;
 import com.caldevsupplychain.account.repository.UserRepository;
-import com.caldevsupplychain.account.vo.RoleName;
-import com.caldevsupplychain.common.bean.account.UserBean;
+import com.caldevsupplychain.account.util.UserMapper;
+import com.caldevsupplychain.account.vo.UserBean;
 import com.caldevsupplychain.common.type.ErrorCode;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authc.credential.PasswordService;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
-import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -30,18 +31,20 @@ public class AccountServiceImpl implements AccountService {
 	private RoleRepository roleRepository;
 	private PermissionRepository permissionRepository;
 	private PasswordService passwordService;
+	private UserMapper userMapper;
 
 	@Override
 	public boolean userExist(String emailAddress) {
-	   return userRepository.findByEmailAddress(emailAddress) != null;
+		return userRepository.findByEmailAddress(emailAddress) != null;
 	}
 
 
 	@Override
 	@Transactional
-	public User createUser(UserBean userBean) {
-
-		Role role = roleRepository.findByName(RoleName.valueOf(userBean.getRole()));
+	public UserBean createUser(UserBean userBean) {
+		// TODO: Allow to create multiple roles at the same time
+		Preconditions.checkState(!userBean.getRoles().isEmpty(), "Must assign more than one role when creating a user.");
+		Role role = roleRepository.findByName(userBean.getRoles().get(0).getName());
 
 		if (role == null) {
 			return null;
@@ -58,25 +61,22 @@ public class AccountServiceImpl implements AccountService {
 		// save to user repository
 		userRepository.save(user);
 
-		return user;
+		return userMapper.map(user, UserBean.class);
 	}
 
 
 	@Override
 	@Transactional
-	@RequiresPermissions("account:update")
-	public User updateUser(UserBean userBean) {
-
+	public UserBean updateUser(UserBean userBean) {
 		User user = userRepository.findByEmailAddress(userBean.getEmailAddress());
 		Preconditions.checkState(user != null, ErrorCode.USER_NOT_FOUND.toString());
 
 		user.setUsername(userBean.getUsername());
 		user.setEmailAddress(userBean.getEmailAddress());
 		user.setPassword(passwordService.encryptPassword(userBean.getPassword()));
-		Optional<String> companyName = Optional.ofNullable(userBean.getCompanyName());
-		companyName.ifPresent(c -> user.setCompany(new Company(c)));
 		userRepository.save(user);
-		return user;
+
+		return userMapper.map(user, UserBean.class);
 	}
 
 	@Override
@@ -88,28 +88,30 @@ public class AccountServiceImpl implements AccountService {
 	}
 
 	@Override
-	public User findById(long id) {
-		return null;
+	public Optional<UserBean> findByUuid(String uuid) {
+		User user = userRepository.findByUuid(uuid);
+		if (user != null) {
+			return Optional.of(userMapper.map(user, UserBean.class));
+		}
+		return Optional.empty();
 	}
 
 	@Override
-	public User findByUuid(String uuid) {
-		return userRepository.findByUuid(uuid);
+	public Optional<UserBean> findByEmailAddress(String emailAddress) {
+		User user = userRepository.findByEmailAddress(emailAddress);
+		if (user != null) {
+			return Optional.of(userMapper.map(user, UserBean.class));
+		}
+		return Optional.empty();
 	}
 
 	@Override
-	public User findByUsername(String username) {
-		return userRepository.findByUsername(username);
-	}
-
-	@Override
-	public User findByEmailAddress(String emailAddress) {
-		return userRepository.findByEmailAddress(emailAddress);
-	}
-
-	@Override
-	public User findByToken(String token) {
-		return userRepository.findByToken(token);
+	public Optional<UserBean> findByToken(String token) {
+		User user = userRepository.findByToken(token);
+		if (user != null) {
+			return Optional.of(userMapper.map(user, UserBean.class));
+		}
+		return Optional.empty();
 	}
 
 }

@@ -7,5 +7,5 @@ import com.caldevsupplychain.account.vo.RoleName;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface PermissionRepository extends PagingAndSortingRepository<Permission, Long> {
-    Permission findByName(PermissionName name);
+	Permission findByName(PermissionName name);
 }
