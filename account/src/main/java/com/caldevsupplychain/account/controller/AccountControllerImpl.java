@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 
+import com.caldevsupplychain.account.model.Role;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -72,6 +75,7 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 
+
 		// need to update after activated link, and user select specific role
 		userWS.setRole(role);
 
@@ -80,7 +84,7 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_EXIST.name(), "Account already registered."), HttpStatus.CONFLICT);
 		}
 
-		UserBean userBean = userMapper.map(userWS, UserBean.class);
+        UserBean userBean = userMapper.map(userWS, UserBean.class);
 
 		// success on checking, create user
 		UserBean user = accountService.createUser(userBean);

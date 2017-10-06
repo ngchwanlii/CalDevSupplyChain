@@ -17,7 +17,7 @@ dependencies {
     compile 'io.springfox:springfox-swagger2:2.7.0'
     compile 'io.springfox:springfox-swagger-ui:2.7.0'
     compile 'org.projectlombok:lombok'
-    compile project(":common")
     compile project(":notification")
+    compile project(":common")
     testCompile group: 'junit', name: 'junit', version: '4.11'
 }
