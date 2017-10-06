@@ -59,7 +59,7 @@ public class UserMapper extends ConfigurableMapper {
 //				.customize(new CustomMapper<UserBean, UserWS>() {
 //					@Override
 //					public void mapAtoB(UserBean userBean, UserWS userWS, MappingContext context) {
-//
+//                      userBean.getRoles().stream().distinct().forEach(role -> userWS.setRole(role.getName().toString()));
 //					}
 //				})
 //				.constructorA()
