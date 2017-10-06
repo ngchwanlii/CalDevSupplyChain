@@ -43,8 +43,6 @@ public class AccountServiceImpl implements AccountService {
 	@Transactional
 	public UserBean createUser(UserBean userBean) {
 
-
-
 		// TODO: Allow to create multiple roles at the same time
 		Preconditions.checkState(!userBean.getRoles().isEmpty(), "Must assign at least one role when creating a user.");
 		Role role = roleRepository.findByName(userBean.getRoles().get(0).getName());
@@ -61,14 +59,9 @@ public class AccountServiceImpl implements AccountService {
 		user.setToken(UUID.randomUUID().toString());
 		user.setRoles(Lists.newArrayList(role));
 
-		log.debug("inside user roles={}", user.getRoles().toString());
-
 		// save to user repository
 		userRepository.save(user);
 
-		log.debug("can't save user");
-
-		// TODO: bug here inside User -> UserBean mapping
 		return userMapper.map(user, UserBean.class);
 	}
 

@@ -89,6 +89,9 @@ public class AccountControllerImpl implements AccountController {
 		// success on checking, create user
 		UserBean user = accountService.createUser(userBean);
 
+		log.warn("completed accountService create userBean={}", user.toString());
+
+
 		try {
 			emailService.sendVerificationTokenEmail(user.getEmailAddress(), user.getToken(), EmailType.REGISTRATION.name());
 		} catch (MessagingException e) {
@@ -119,6 +122,7 @@ public class AccountControllerImpl implements AccountController {
 		}
 
 		UserBean userBean = userMapper.map(userWS, UserBean.class);
+		
 		UserBean updatedUser = accountService.updateUser(userBean);
 
 		log.info("EDIT USER SUCCESS");
