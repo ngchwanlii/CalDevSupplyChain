@@ -3,8 +3,10 @@ package com.caldevsupplychain.account.service;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 
+import com.caldevsupplychain.account.util.UserMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,7 +18,6 @@ import com.caldevsupplychain.account.model.User;
 import com.caldevsupplychain.account.repository.PermissionRepository;
 import com.caldevsupplychain.account.repository.RoleRepository;
 import com.caldevsupplychain.account.repository.UserRepository;
-import com.caldevsupplychain.account.util.UserMapper;
 import com.caldevsupplychain.account.vo.UserBean;
 import com.caldevsupplychain.common.type.ErrorCode;
 import com.google.common.base.Preconditions;
@@ -62,9 +63,8 @@ public class AccountServiceImpl implements AccountService {
 		// save to user repository
 		userRepository.save(user);
 
-		return userMapper.map(user, UserBean.class);
+		return userMapper.MAPPER.userToUserBean(user);
 	}
-
 
 	@Override
 	@Transactional
@@ -77,7 +77,7 @@ public class AccountServiceImpl implements AccountService {
 		user.setPassword(passwordService.encryptPassword(userBean.getPassword()));
 		userRepository.save(user);
 
-		return userMapper.map(user, UserBean.class);
+		return userMapper.MAPPER.userToUserBean(user);
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class AccountServiceImpl implements AccountService {
 	public Optional<UserBean> findByUuid(String uuid) {
 		User user = userRepository.findByUuid(uuid);
 		if (user != null) {
-			return Optional.of(userMapper.map(user, UserBean.class));
+			return Optional.of(userMapper.MAPPER.userToUserBean(user));
 		}
 		return Optional.empty();
 	}
@@ -101,7 +101,7 @@ public class AccountServiceImpl implements AccountService {
 	public Optional<UserBean> findByEmailAddress(String emailAddress) {
 		User user = userRepository.findByEmailAddress(emailAddress);
 		if (user != null) {
-			return Optional.of(userMapper.map(user, UserBean.class));
+			return Optional.of(userMapper.MAPPER.userToUserBean(user));
 		}
 		return Optional.empty();
 	}
@@ -110,9 +110,8 @@ public class AccountServiceImpl implements AccountService {
 	public Optional<UserBean> findByToken(String token) {
 		User user = userRepository.findByToken(token);
 		if (user != null) {
-			return Optional.of(userMapper.map(user, UserBean.class));
+			return Optional.of(userMapper.MAPPER.userToUserBean(user));
 		}
 		return Optional.empty();
 	}
-
 }

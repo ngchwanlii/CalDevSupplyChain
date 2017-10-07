@@ -1,33 +1,5 @@
 package com.caldevsupplychain.account.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.mail.MessagingException;
-
-import com.caldevsupplychain.account.model.Role;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.caldevsupplychain.account.service.AccountService;
 import com.caldevsupplychain.account.util.UserMapper;
 import com.caldevsupplychain.account.validator.EditUserValidator;
@@ -41,6 +13,22 @@ import com.caldevsupplychain.common.ws.account.ErrorWS;
 import com.caldevsupplychain.common.ws.account.UserWS;
 import com.caldevsupplychain.notification.mail.service.EmailService;
 import com.caldevsupplychain.notification.mail.type.EmailType;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.mail.MessagingException;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -75,7 +63,6 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 
-
 		// need to update after activated link, and user select specific role
 		userWS.setRole(role);
 
@@ -84,20 +71,21 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_EXIST.name(), "Account already registered."), HttpStatus.CONFLICT);
 		}
 
-        UserBean userBean = userMapper.map(userWS, UserBean.class);
+		// TODO: MapStruct testing here
+        UserBean userBean = userMapper.MAPPER.userWSToUserBean(userWS);
+		log.warn("check userBean={} ", userBean.toString());
 
 		// success on checking, create user
 		UserBean user = accountService.createUser(userBean);
 
-		log.warn("completed accountService create userBean={}", user.toString());
-
+		log.warn("after user -> userBean checking userBean={}", userBean.toString());
 
 		try {
 			emailService.sendVerificationTokenEmail(user.getEmailAddress(), user.getToken(), EmailType.REGISTRATION.name());
 		} catch (MessagingException e) {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.EMAIL_MESSAGING_EXCEPTION.name(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<>(userMapper.map(user, UserWS.class), HttpStatus.CREATED);
+		return new ResponseEntity<>(userMapper.MAPPER.userBeanToUserWS(user), HttpStatus.CREATED);
 	}
 
 	// update as a form
@@ -121,13 +109,17 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_NOT_EXIST.name(), "Cannot find account."), HttpStatus.NOT_FOUND);
 		}
 
-		UserBean userBean = userMapper.map(userWS, UserBean.class);
-		
+		// TODO: maybe use RoleBean
+		userWS.setRole(user.get().getRoles().get(0).getName().toString());
+
+		UserBean userBean = userMapper.MAPPER.userWSToUserBean(userWS);
+		log.error("after update: userBean in controller={}", userBean.toString());
+
 		UserBean updatedUser = accountService.updateUser(userBean);
 
 		log.info("EDIT USER SUCCESS");
 
-		return new ResponseEntity<>(userMapper.map(updatedUser, UserWS.class), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.MAPPER.userBeanToUserWS(updatedUser), HttpStatus.OK);
 	}
 
 	@GetMapping("/activate/{token}")
@@ -139,7 +131,7 @@ public class AccountControllerImpl implements AccountController {
 		}
 		accountService.activateUser(user.get().getId());
 
-		return new ResponseEntity<>(userMapper.map(user.get(), UserWS.class), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.MAPPER.userBeanToUserWS(user.get()), HttpStatus.OK);
 	}
 
 
@@ -177,8 +169,9 @@ public class AccountControllerImpl implements AccountController {
 				return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.LOGIN_INVALID.name(), e.getMessage()), HttpStatus.UNAUTHORIZED);
 			}
 		}
+
 		// success login -> return JSON object
-		return new ResponseEntity<>(userMapper.map(user.get(), UserWS.class), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.MAPPER.userBeanToUserWS(user.get()), HttpStatus.OK);
 	}
 
 
@@ -198,6 +191,6 @@ public class AccountControllerImpl implements AccountController {
 		// logout
 		subject.logout();
 
-		return new ResponseEntity<>(userMapper.map(user.get(), UserWS.class), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.MAPPER.userBeanToUserWS(user.get()), HttpStatus.OK);
 	}
 }

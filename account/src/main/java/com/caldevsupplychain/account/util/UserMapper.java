@@ -5,67 +5,35 @@ import com.caldevsupplychain.account.model.User;
 import com.caldevsupplychain.account.vo.UserBean;
 import com.caldevsupplychain.common.ws.account.UserWS;
 import com.google.common.collect.Lists;
-import lombok.extern.slf4j.Slf4j;
-import ma.glasnost.orika.CustomMapper;
-import ma.glasnost.orika.MapperFactory;
-import ma.glasnost.orika.MappingContext;
-import ma.glasnost.orika.impl.ConfigurableMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.mapstruct.InheritInverseConfiguration;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
+import org.mapstruct.factory.Mappers;
 
-@Component
-@Slf4j
-public class UserMapper extends ConfigurableMapper {
+import java.util.List;
 
-	@Override
-	protected void configure(MapperFactory factory) {
+@Mapper(componentModel = "spring",
+		unmappedTargetPolicy = ReportingPolicy.IGNORE
+)
+public interface UserMapper {
 
-		// WS to Bean: field is (Bi-directional)
-		factory.classMap(UserWS.class, UserBean.class)
-				.fieldAToB("role", "roles{}")
-				.customize(new CustomMapper<UserWS, UserBean>() {
-					@Override
-					public void mapAtoB(UserWS userWS, UserBean userBean, MappingContext context) {
-						userBean.setRoles(Lists.newArrayList(new Role(userWS.getRole())));
-					}
-				})
-				.constructorA()
-				.constructorB()
-				.byDefault()
-				.register();
+	UserMapper MAPPER = Mappers.getMapper(UserMapper.class);
 
+	@Mapping(target="roles", source="role")
+	UserBean userWSToUserBean(UserWS userWS);
 
-		// Entity to Bean
-		factory.classMap(User.class, UserBean.class)
-				.field("roles{}", "roles{}")
-				.customize(new CustomMapper<User, UserBean>() {
-					@Override
-					public void mapAtoB(User user, UserBean userBean, MappingContext context) {
-						userBean.setRoles(user.getRoles());
-					}
-				})
-				.constructorA()
-				.constructorB()
-				.byDefault()
-				.register();
-
-
-
-
-		// Bean <> WS
-		// TODO: buggy here
-//		factory.classMap(UserBean.class, UserWS.class)
-//				.fieldAToB("roles{name}", "role")
-//				.customize(new CustomMapper<UserBean, UserWS>() {
-//					@Override
-//					public void mapAtoB(UserBean userBean, UserWS userWS, MappingContext context) {
-//                      userBean.getRoles().stream().distinct().forEach(role -> userWS.setRole(role.getName().toString()));
-//					}
-//				})
-//				.constructorA()
-//				.constructorB()
-//				.byDefault()
-//				.register();
-
+	// custom convert method
+	default List<Role> mapStringRoleToListRole(String role) {
+		return Lists.newArrayList(new Role(role));
 	}
+
+	@InheritInverseConfiguration
+	UserWS userBeanToUserWS(UserBean userBean);
+
+	default String mapListRoleToStringRole(List<Role> roles) {
+		return roles.get(0).getName().toString();
+	}
+
+	UserBean userToUserBean(User user);
 }
