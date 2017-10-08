@@ -1,10 +1,8 @@
 package com.caldevsupplychain.account.repository;
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
 import com.caldevsupplychain.account.model.Role;
 import com.caldevsupplychain.account.vo.RoleName;
-import org.springframework.stereotype.Component;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 

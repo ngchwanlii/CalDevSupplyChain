@@ -18,14 +18,7 @@ public class ApiErrorsWS implements Serializable {
 		this.errors = errors;
 	}
 
-
-	/*
-		@Description:   Be consistent, return an array of error even though it is just one errorCode
-						easier for front-end to use array.map((c) -> doSomething)) to handle all the errorCode
-		@return:        List<ErrorWS>
-	*/
 	public ApiErrorsWS(String errorCode, String message) {
 		this.errors = Lists.newArrayList(new ErrorWS(errorCode, message));
 	}
-
 }

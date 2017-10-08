@@ -21,7 +21,6 @@ import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
@@ -47,7 +46,7 @@ public class AccountControllerImpl implements AccountController {
 	private LoginValidator loginValidator;
 	private EditUserValidator editUserValidator;
 
-	/* exception handler for form fields and bind field errors together */
+	/* exception handler */
 	private ApiErrorsExceptionHandler apiErrorsExceptionHandler;
 
 	/************************************************************************************************
@@ -57,25 +56,22 @@ public class AccountControllerImpl implements AccountController {
 	public ResponseEntity<?> signup(@RequestParam(required = false, defaultValue = "USER") String role, @Validated @RequestBody UserWS userWS) {
 		BindException errors = new BindException(userWS, "UserWS");
 
-		// signup form validation
 		signupValidator.validate(userWS, errors);
 
 		if (errors.hasErrors()) {
-			log.error("ERROR IN SIGNUP VALIDATION");
+			log.error("Error in signup user. Fail in signup validation fields. userWS={}", userWS.toString());
 			List<ErrorWS> errorWSList = apiErrorsExceptionHandler.generateErrorWSList(errors);
 			return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 
 		userWS.setRoles(Lists.newArrayList(role));
 
-		// check if user pre-exist or not
 		if (accountService.userExist(userWS.getEmailAddress())) {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_EXIST.name(), "Account already registered."), HttpStatus.CONFLICT);
 		}
 
         UserBean userBean = userMapper.MAPPER.userWSToBean(userWS);
 
-		// success on checking, create user
 		UserBean user = accountService.createUser(userBean);
 
 		try {
@@ -87,16 +83,15 @@ public class AccountControllerImpl implements AccountController {
 		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(user), HttpStatus.CREATED);
 	}
 
-	// update as a form
 	@RequiresPermissions("account:update")
-	@PostMapping("/users/{uuid}")
+	@PutMapping("/users/{uuid}")
 	public ResponseEntity<?> updateUser(@PathVariable("uuid") String uuid, @Validated @RequestBody UserWS userWS) {
 		BindException errors = new BindException(userWS, "UserWS");
 
 		editUserValidator.validate(userWS, errors);
 
 		if (errors.hasErrors()) {
-			log.error("ERROR IN EDIT USER VALIDATION");
+			log.error("Error in update user. Fail in edit user validation fields. userWS={}", userWS.toString());
 			List<ErrorWS> errorWSList = apiErrorsExceptionHandler.generateErrorWSList(errors);
 			return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
@@ -104,7 +99,7 @@ public class AccountControllerImpl implements AccountController {
 		Optional<UserBean> user = accountService.findByUuid(uuid);
 
 		if (!user.isPresent()) {
-			log.error("ERROR IN EDIT USER");
+			log.error("Error in update user. Fail in finding user's uuid={}", uuid);
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_NOT_EXIST.name(), "Cannot find account."), HttpStatus.NOT_FOUND);
 		}
 
@@ -112,7 +107,7 @@ public class AccountControllerImpl implements AccountController {
 
 		UserBean updatedUser = accountService.updateUser(userBean);
 
-		log.info("EDIT USER SUCCESS");
+		log.info("Success in update user={}", updatedUser.toString());
 
 		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(updatedUser), HttpStatus.OK);
 	}
@@ -134,25 +129,22 @@ public class AccountControllerImpl implements AccountController {
 	public ResponseEntity<?> login(@Validated @RequestBody UserWS userWS) {
 		BindException errors = new BindException(userWS, "UserWS");
 
-		// signup form validation
 		loginValidator.validate(userWS, errors);
 
 		if (errors.hasErrors()) {
-			log.error("ERROR IN LOGIN VALIDATION");
+			log.error("Error in login. Fail in login validation. userWS={}", userWS.toString());
 			List<ErrorWS> errorWSList = apiErrorsExceptionHandler.generateErrorWSList(errors);
 			return new ResponseEntity<>(new ApiErrorsWS(errorWSList), HttpStatus.UNPROCESSABLE_ENTITY);
 		}
 
 		Optional<UserBean> user = accountService.findByEmailAddress(userWS.getEmailAddress());
 
-		// first check if user account exists or not
 		if (!user.isPresent()) {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.LOGIN_INVALID.name(), "Invalid Login"), HttpStatus.UNAUTHORIZED);
 		}
 
 		Subject subject = SecurityUtils.getSubject();
 
-		// Apache Shiro authentication check
 		if (!subject.isAuthenticated()) {
 
 			UsernamePasswordToken token = new UsernamePasswordToken(userWS.getEmailAddress(), userWS.getPassword());
@@ -161,28 +153,28 @@ public class AccountControllerImpl implements AccountController {
 			try {
 				subject.login(token);
 			} catch (AuthenticationException e) {
-				log.error("ERROR IN USER LOGIN");
+				log.error("Error in login. Fail in subject.login. AuthenticationException message={}", e.getMessage());
 				return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.LOGIN_INVALID.name(), e.getMessage()), HttpStatus.UNAUTHORIZED);
 			}
 		}
 
-		// success login -> return JSON object
+		log.info("Success in login. user={}", user.toString());
+
 		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(user.get()), HttpStatus.OK);
 	}
 
-
-	@PostMapping("/logout")
+	@GetMapping("/logout")
 	public ResponseEntity<?> logout() {
 		Subject subject = SecurityUtils.getSubject();
 
 		Optional<UserBean> user = accountService.findByUuid(subject.getPrincipal().toString());
 
 		if (!user.isPresent()) {
-			log.error("ERROR IN USER LOGOUT");
+			log.error("Error in logout. Fail in finding user's uuid={}", subject.getPrincipal().toString());
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.LOGOUT_INVALID.name(), "Logout Invalid"), HttpStatus.BAD_REQUEST);
 		}
 
-		log.info("USER LOGOUT SUCCESS");
+		log.info("Success in logout. user={}", user.toString());
 
 		// logout
 		subject.logout();

@@ -1,12 +1,9 @@
 package com.caldevsupplychain.account.service;
 
 
-import java.util.List;
-import java.util.Optional;
-
-import com.caldevsupplychain.account.model.Role;
-import com.caldevsupplychain.account.vo.RoleName;
 import com.caldevsupplychain.account.vo.UserBean;
+
+import java.util.Optional;
 
 public interface AccountService {
 	boolean userExist(String emailAddress);

@@ -5,10 +5,7 @@ import com.caldevsupplychain.account.model.User;
 import com.caldevsupplychain.account.vo.RoleName;
 import com.caldevsupplychain.account.vo.UserBean;
 import com.caldevsupplychain.common.ws.account.UserWS;
-import org.mapstruct.DecoratedWith;
-import org.mapstruct.IterableMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Component;
 

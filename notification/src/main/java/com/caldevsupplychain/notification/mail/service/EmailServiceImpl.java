@@ -3,7 +3,6 @@ package com.caldevsupplychain.notification.mail.service;
 import com.caldevsupplychain.notification.mail.model.EmailTemplate;
 import com.caldevsupplychain.notification.mail.repository.EmailTemplateRepository;
 import com.caldevsupplychain.notification.mail.type.EmailType;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -15,8 +14,6 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 
 @Slf4j
 @Service
@@ -48,7 +45,6 @@ public class EmailServiceImpl implements EmailService {
 		sendMimeMessage(emailTemplate);
 	}
 
-	// create mime email message
 	public void sendMimeMessage(EmailTemplate emailTemplate) throws MessagingException {
 
 		MimeMessage message = javaMailSender.createMimeMessage();

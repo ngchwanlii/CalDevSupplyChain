@@ -72,7 +72,6 @@ public class SecurityConfig {
 
 	@Bean(name = "jpaRealm")
 	public JpaRealm jpaRealm() {
-		// configure into realm
 		JpaRealm jpaRealm = new JpaRealm();
 		jpaRealm.setCredentialsMatcher(credentialsMatcher());
 		jpaRealm.setCachingEnabled(true);
@@ -97,7 +96,6 @@ public class SecurityConfig {
 	@Bean
 	public FilterRegistrationBean filterRegistrationBean() {
 		FilterRegistrationBean filterRegistration = new FilterRegistrationBean();
-		// TODO: maybe delegating filter proxy set to true
 		DelegatingFilterProxy dfp = new DelegatingFilterProxy("shiroFilter");
 		dfp.setTargetFilterLifecycle(true);
 		filterRegistration.setFilter(dfp);

@@ -3,7 +3,6 @@ package com.caldevsupplychain.account.validator;
 import com.caldevsupplychain.common.type.ErrorCode;
 import com.caldevsupplychain.common.validator.EmailValidator;
 import com.caldevsupplychain.common.ws.account.UserWS;
-import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,10 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
-
-import javax.swing.text.html.Option;
-import java.util.Optional;
-import java.util.regex.Pattern;
 
 @Component
 @Slf4j

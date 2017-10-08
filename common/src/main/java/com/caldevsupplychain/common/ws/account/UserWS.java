@@ -1,15 +1,10 @@
 package com.caldevsupplychain.common.ws.account;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-
 
 @Data
 public class UserWS implements Serializable {
@@ -18,6 +13,7 @@ public class UserWS implements Serializable {
 	private String uuid;
 	private String username;
 	private String emailAddress;
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String password;
 	private List<String> roles;
 }
