@@ -10,7 +10,6 @@ import org.apache.shiro.authc.credential.PasswordMatcher;
 import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
@@ -71,8 +70,8 @@ public class SecurityConfig {
 		return credentialsMatcher;
 	}
 
-	@Bean(name = "realm")
-	public Realm realm() {
+	@Bean(name = "AuthorizingRealm")
+	public JpaRealm realm() {
 		JpaRealm jpaRealm = new JpaRealm();
 		jpaRealm.setCredentialsMatcher(credentialsMatcher());
 		jpaRealm.setCachingEnabled(true);

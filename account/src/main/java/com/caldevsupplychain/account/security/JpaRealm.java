@@ -31,7 +31,7 @@ public class JpaRealm extends AuthorizingRealm  {
 	private UserMapper userMapper;
 
 	public JpaRealm() {
-		setName("realm");
+		setName("AuthorizingRealm");
 	}
 
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
