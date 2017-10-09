@@ -32,10 +32,6 @@ public class JpaRealm extends AuthorizingRealm  {
 	@Autowired
 	private UserMapper userMapper;
 
-	public JpaRealm() {
-		setName("jpaRealm");
-	}
-
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
 
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;

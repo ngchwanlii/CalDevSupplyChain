@@ -7,16 +7,23 @@ import org.apache.shiro.authc.credential.PasswordService;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
 import org.apache.shiro.realm.Realm;
+import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
 import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.caldevsupplychain.account.security.JpaRealm;
+import org.springframework.context.annotation.DependsOn;
 
 @Configuration
+@EnableAutoConfiguration
 public class ShiroConfig {
+
 	@Bean
 	public Realm realm() {
 		JpaRealm jpaRealm = new JpaRealm();
@@ -28,14 +35,12 @@ public class ShiroConfig {
 	@Bean
 	public ShiroFilterChainDefinition shiroFilterChainDefinition() {
 		DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-		// use permissive to NOT require authentication, our controller Annotations will decide that
 		chainDefinition.addPathDefinition("/**", "authcBasic[permissive]");
 		return chainDefinition;
 	}
 
 	@Bean
 	public CacheManager cacheManager() {
-		// Caching isn't needed in this example, but we will use the MemoryConstrainedCacheManager for this example.
 		return new MemoryConstrainedCacheManager();
 	}
 
@@ -56,5 +61,18 @@ public class ShiroConfig {
 		PasswordMatcher credentialsMatcher = new PasswordMatcher();
 		credentialsMatcher.setPasswordService(new DefaultPasswordService());
 		return credentialsMatcher;
+	}
+
+	@Bean(name = "lifecycleBeanPostProcessor")
+	public LifecycleBeanPostProcessor lifecycleBeanPostProcessor() {
+		return new LifecycleBeanPostProcessor();
+	}
+
+	@Bean
+	@DependsOn("lifecycleBeanPostProcessor")
+	public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator() {
+		DefaultAdvisorAutoProxyCreator daapc = new DefaultAdvisorAutoProxyCreator();
+		daapc.setProxyTargetClass(true);
+		return daapc;
 	}
 }
