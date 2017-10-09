@@ -70,22 +70,21 @@ public class SecurityConfig {
 		return credentialsMatcher;
 	}
 
-	@Bean(name = "AuthorizingRealm")
-	public JpaRealm realm() {
+	@Bean(name = "securityManager")
+	public DefaultWebSecurityManager securityManager() {
+		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
+		securityManager.setRealm(jpaRealm());
+		SecurityUtils.setSecurityManager(securityManager);
+		return securityManager;
+	}
+
+	@Bean(name = "jpaRealm")
+	public JpaRealm jpaRealm() {
 		JpaRealm jpaRealm = new JpaRealm();
 		jpaRealm.setCredentialsMatcher(credentialsMatcher());
 		jpaRealm.setCachingEnabled(true);
 		return jpaRealm;
 	}
-
-	@Bean(name = "securityManager")
-	public DefaultWebSecurityManager securityManager() {
-		DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
-		securityManager.setRealm(realm());
-		SecurityUtils.setSecurityManager(securityManager);
-		return securityManager;
-	}
-
 
 	@Bean
 	public CacheManager cacheManager() {
@@ -99,7 +98,7 @@ public class SecurityConfig {
 		dfp.setTargetFilterLifecycle(true);
 		filterRegistration.setFilter(dfp);
 		filterRegistration.setEnabled(true);
-		filterRegistration.addUrlPatterns("/*");
+//		filterRegistration.addUrlPatterns("/*");
 		return filterRegistration;
 	}
 }
