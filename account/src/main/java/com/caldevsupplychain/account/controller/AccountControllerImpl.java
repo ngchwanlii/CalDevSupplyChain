@@ -1,5 +1,31 @@
 package com.caldevsupplychain.account.controller;
 
+import java.util.List;
+import java.util.Optional;
+
+import javax.mail.MessagingException;
+
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.subject.Subject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.caldevsupplychain.account.service.AccountService;
 import com.caldevsupplychain.account.util.UserMapper;
 import com.caldevsupplychain.account.validator.EditUserValidator;
@@ -14,22 +40,6 @@ import com.caldevsupplychain.common.ws.account.UserWS;
 import com.caldevsupplychain.notification.mail.service.EmailService;
 import com.caldevsupplychain.notification.mail.type.EmailType;
 import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject.Subject;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import javax.mail.MessagingException;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController

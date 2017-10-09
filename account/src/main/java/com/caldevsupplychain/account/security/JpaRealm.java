@@ -1,10 +1,9 @@
 package com.caldevsupplychain.account.security;
 
-import com.caldevsupplychain.account.model.User;
-import com.caldevsupplychain.account.service.AccountService;
-import com.caldevsupplychain.account.util.UserMapper;
-import com.caldevsupplychain.account.vo.UserBean;
+import java.util.stream.Collectors;
+
 import lombok.extern.slf4j.Slf4j;
+
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.SimpleAuthenticationInfo;
@@ -17,7 +16,10 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.stream.Collectors;
+import com.caldevsupplychain.account.model.User;
+import com.caldevsupplychain.account.service.AccountService;
+import com.caldevsupplychain.account.util.UserMapper;
+import com.caldevsupplychain.account.vo.UserBean;
 
 @Slf4j
 @Component
@@ -38,7 +40,7 @@ public class JpaRealm extends AuthorizingRealm  {
 
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
 
-		UserBean user = accountService.findByEmailAddress(token.getPrincipal().toString()).orElse(null);
+		UserBean user = accountService.findByEmailAddress(token.getUsername()).orElse(null);
 
 		if (user != null && passwordService.passwordsMatch(token.getPassword(), user.getPassword())) {
 			return new SimpleAuthenticationInfo(user.getUuid(), user.getPassword(), getName());

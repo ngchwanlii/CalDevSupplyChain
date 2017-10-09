@@ -18,7 +18,7 @@ spring:
       ddl-auto: none
       naming-strategy: org.springframework.boot.orm.jpa.hibernate.SpringNamingStrategy
       dialect: org.hibernate.dialect.MySQL5Dialect
-      show-sql: true
+    show-sql: false
   jackson:
     serialization:
       write_dates_as_timestamps: false
