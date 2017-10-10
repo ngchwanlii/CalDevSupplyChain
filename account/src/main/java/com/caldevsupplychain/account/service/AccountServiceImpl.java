@@ -54,9 +54,8 @@ public class AccountServiceImpl implements AccountService {
 
 		userRepository.save(user);
 
-		return userMapper.MAPPER.userToBean(user);
+		return userMapper.userToBean(user);
 	}
-
 
 	@Override
 	@Transactional
@@ -69,7 +68,7 @@ public class AccountServiceImpl implements AccountService {
 		user.setPassword(passwordService.encryptPassword(userBean.getPassword()));
 		userRepository.save(user);
 
-		return userMapper.MAPPER.userToBean(user);
+		return userMapper.userToBean(user);
 	}
 
 	@Override
@@ -84,7 +83,7 @@ public class AccountServiceImpl implements AccountService {
 	public Optional<UserBean> findByUuid(String uuid) {
 		User user = userRepository.findByUuid(uuid);
 		if (user != null) {
-			return Optional.of(userMapper.MAPPER.userToBean(user));
+			return Optional.of(userMapper.userToBean(user));
 		}
 		return Optional.empty();
 	}
@@ -93,7 +92,7 @@ public class AccountServiceImpl implements AccountService {
 	public Optional<UserBean> findByEmailAddress(String emailAddress) {
 		User user = userRepository.findByEmailAddress(emailAddress);
 		if (user != null) {
-			return Optional.of(userMapper.MAPPER.userToBean(user));
+			return Optional.of(userMapper.userToBean(user));
 		}
 		return Optional.empty();
 	}
@@ -102,9 +101,8 @@ public class AccountServiceImpl implements AccountService {
 	public Optional<UserBean> findByToken(String token) {
 		User user = userRepository.findByToken(token);
 		if (user != null) {
-			return Optional.of(userMapper.MAPPER.userToBean(user));
+			return Optional.of(userMapper.userToBean(user));
 		}
 		return Optional.empty();
 	}
-
 }

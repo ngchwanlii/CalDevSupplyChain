@@ -80,7 +80,7 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_EXIST.name(), "Account already registered."), HttpStatus.CONFLICT);
 		}
 
-        UserBean userBean = userMapper.MAPPER.userWSToBean(userWS);
+        UserBean userBean = userMapper.userWSToBean(userWS);
 
 		UserBean user = accountService.createUser(userBean);
 
@@ -90,7 +90,7 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.EMAIL_MESSAGING_EXCEPTION.name(), e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(user), HttpStatus.CREATED);
+		return new ResponseEntity<>(userMapper.userBeanToWS(user), HttpStatus.CREATED);
 	}
 
 	@RequiresPermissions("account:update")
@@ -113,13 +113,13 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_NOT_EXIST.name(), "Cannot find account."), HttpStatus.NOT_FOUND);
 		}
 
-		UserBean userBean = userMapper.MAPPER.userWSToBean(userWS);
+		UserBean userBean = userMapper.userWSToBean(userWS);
 
 		UserBean updatedUser = accountService.updateUser(userBean);
 
 		log.info("Success in update user={}", updatedUser.toString());
 
-		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(updatedUser), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.userBeanToWS(updatedUser), HttpStatus.OK);
 	}
 
 	@GetMapping("/activate/{token}")
@@ -131,7 +131,7 @@ public class AccountControllerImpl implements AccountController {
 		}
 		accountService.activateUser(user.get().getId());
 
-		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(user.get()), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.userBeanToWS(user.get()), HttpStatus.OK);
 	}
 
 
@@ -170,7 +170,7 @@ public class AccountControllerImpl implements AccountController {
 
 		log.info("Success in login. user={}", user.toString());
 
-		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(user.get()), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.userBeanToWS(user.get()), HttpStatus.OK);
 	}
 
 	@GetMapping("/logout")
@@ -189,6 +189,6 @@ public class AccountControllerImpl implements AccountController {
 		// logout
 		subject.logout();
 
-		return new ResponseEntity<>(userMapper.MAPPER.userBeanToWS(user.get()), HttpStatus.OK);
+		return new ResponseEntity<>(userMapper.userBeanToWS(user.get()), HttpStatus.OK);
 	}
 }

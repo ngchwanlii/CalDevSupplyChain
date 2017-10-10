@@ -60,6 +60,7 @@ INSERT INTO permissions (name) VALUES ('ACCOUNT_ADMIN');
 
 # USER PERMISSION
 INSERT INTO role_2_permission VALUES (1, 1);
+INSERT INTO role_2_permission VALUES (1, 2);
 
 # AGENT PERMISSION
 INSERT INTO role_2_permission VALUES (2, 1);

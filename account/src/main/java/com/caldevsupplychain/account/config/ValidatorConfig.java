@@ -9,6 +9,7 @@ import com.caldevsupplychain.account.validator.SignupValidator;
 
 @Configuration
 public class ValidatorConfig {
+
 	@Bean
 	public SignupValidator signupValidator() {
 		return new SignupValidator();

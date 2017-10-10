@@ -33,7 +33,6 @@ public class JpaRealm extends AuthorizingRealm  {
 	private UserMapper userMapper;
 
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authcToken) {
-
 		UsernamePasswordToken token = (UsernamePasswordToken) authcToken;
 
 		UserBean user = accountService.findByEmailAddress(token.getUsername()).orElse(null);
@@ -49,7 +48,7 @@ public class JpaRealm extends AuthorizingRealm  {
 		String uuid = (String) principals.fromRealm(getName()).iterator().next();
 		UserBean userBean = accountService.findByUuid(uuid).orElse(null);
 
-		User user = userMapper.MAPPER.userBeanToUser(userBean);
+		User user = userMapper.userBeanToUser(userBean);
 
 		if (user != null) {
 			SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
@@ -61,6 +60,4 @@ public class JpaRealm extends AuthorizingRealm  {
 		}
 		return null;
 	}
-
-
 }

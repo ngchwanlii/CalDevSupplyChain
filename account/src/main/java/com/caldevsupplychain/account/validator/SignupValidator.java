@@ -1,14 +1,15 @@
 package com.caldevsupplychain.account.validator;
 
-import com.caldevsupplychain.common.type.ErrorCode;
-import com.caldevsupplychain.common.validator.EmailValidator;
-import com.caldevsupplychain.common.ws.account.UserWS;
 import org.apache.shiro.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+
+import com.caldevsupplychain.common.type.ErrorCode;
+import com.caldevsupplychain.common.validator.EmailValidator;
+import com.caldevsupplychain.common.ws.account.UserWS;
 
 @Component
 public class SignupValidator implements Validator {
@@ -31,5 +32,4 @@ public class SignupValidator implements Validator {
 		}
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", ErrorCode.PASSWORD_EMPTY.name(), "Please specify a password.");
 	}
-
 }

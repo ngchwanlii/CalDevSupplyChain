@@ -1,9 +1,9 @@
 package com.caldevsupplychain.account.vo;
 
 
-import lombok.Data;
-
 import java.util.List;
+
+import lombok.Data;
 
 @Data
 public class UserBean {
@@ -14,5 +14,4 @@ public class UserBean {
 	private String password;
 	private String token;
 	private List<RoleName> roles;
-
 }

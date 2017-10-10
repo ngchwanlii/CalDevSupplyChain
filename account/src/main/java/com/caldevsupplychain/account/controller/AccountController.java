@@ -7,6 +7,7 @@ import com.caldevsupplychain.common.ws.account.UserWS;
 
 
 public interface AccountController {
+
 	ResponseEntity<?> signup(String role, UserWS userWS);
 
 	ResponseEntity<?> updateUser(String uuid, UserWS userWS);
