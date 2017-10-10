@@ -1,9 +1,8 @@
 package com.caldevsupplychain.account.repository;
 
 
-import org.springframework.data.repository.PagingAndSortingRepository;
-
 import com.caldevsupplychain.account.model.User;
+import org.springframework.data.repository.PagingAndSortingRepository;
 
 public interface UserRepository extends PagingAndSortingRepository<User, Long> {
 

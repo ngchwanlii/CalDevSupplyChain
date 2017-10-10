@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS user_2_role (
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
+
 CREATE UNIQUE INDEX user_2_role_idx01
   ON user_2_role (user_id, role_id);
 

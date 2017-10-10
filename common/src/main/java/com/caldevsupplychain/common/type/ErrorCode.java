@@ -17,6 +17,7 @@ public enum ErrorCode {
 
 	INVALID_TOKEN,
 
+
 	LOGIN_INVALID,
 	LOGOUT_INVALID,
 
@@ -24,5 +25,7 @@ public enum ErrorCode {
 
 	// delete later for testing
 	PERMISSION_DENIED,
+	PERMISSION_DENIED_ON_EMAIL_UPDATE,
+	PERMISSION_DENIED_ON_ROLE_UPDATE
 
 }

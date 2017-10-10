@@ -21,7 +21,7 @@ public class User extends BaseEntity {
 	@Column(name = "username", nullable = false)
 	private String username;
 
-	@Column(name = "email_address", nullable = false)
+	@Column(name = "email_address", nullable = false, updatable = false)
 	private String emailAddress;
 
 	@Column(name = "token")

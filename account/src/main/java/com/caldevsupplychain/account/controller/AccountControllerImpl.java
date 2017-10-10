@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.mail.MessagingException;
 
+import com.caldevsupplychain.account.vo.RoleName;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -108,9 +109,20 @@ public class AccountControllerImpl implements AccountController {
 
 		Optional<UserBean> user = accountService.findByUuid(uuid);
 
-		if (!user.isPresent()) {
+		Subject subject = SecurityUtils.getSubject();
+
+		if (!subject.getPrincipal().toString().equals(uuid) || !user.isPresent()) {
 			log.error("Error in update user. Fail in finding user's uuid={}", uuid);
-			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_NOT_EXIST.name(), "Cannot find account."), HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.ACCOUNT_NOT_EXIST.name(), "Cannot find user account."), HttpStatus.NOT_FOUND);
+		}
+
+		if(!subject.hasRole(RoleName.ADMIN.name()) && userWS.getRoles() != null) {
+			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.PERMISSION_DENIED_ON_ROLE_UPDATE.name(), "User cannot update role"), HttpStatus.BAD_REQUEST);
+		}
+
+
+		if(!subject.hasRole(RoleName.ADMIN.name()) && !userWS.getEmailAddress().equals(user.get().getEmailAddress())){
+			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.PERMISSION_DENIED_ON_EMAIL_UPDATE.name(), "User cannot update email address"), HttpStatus.BAD_REQUEST);
 		}
 
 		UserBean userBean = userMapper.userWSToBean(userWS);

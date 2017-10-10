@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import javax.transaction.Transactional;
 
+import com.caldevsupplychain.account.util.RoleMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +31,7 @@ public class AccountServiceImpl implements AccountService {
 	private RoleRepository roleRepository;
 	private PasswordService passwordService;
 	private UserMapper userMapper;
+	private RoleMapper roleMapper;
 
 	@Override
 	public boolean userExist(String emailAddress) {
@@ -60,13 +62,14 @@ public class AccountServiceImpl implements AccountService {
 	@Override
 	@Transactional
 	public UserBean updateUser(UserBean userBean) {
+
 		User user = userRepository.findByEmailAddress(userBean.getEmailAddress());
+
 		Preconditions.checkState(user != null, ErrorCode.USER_NOT_FOUND.toString());
 
 		user.setUsername(userBean.getUsername());
-		user.setEmailAddress(userBean.getEmailAddress());
 		user.setPassword(passwordService.encryptPassword(userBean.getPassword()));
-		userRepository.save(user);
+		Optional.ofNullable(userBean.getRoles()).ifPresent(roleNames -> user.setRoles(roleMapper.toRoleList(roleNames)));
 
 		return userMapper.userToBean(user);
 	}
