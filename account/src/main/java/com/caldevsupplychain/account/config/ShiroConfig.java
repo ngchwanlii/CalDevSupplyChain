@@ -18,6 +18,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 @Configuration
 @EnableAutoConfiguration
 public class ShiroConfig {
@@ -73,4 +76,6 @@ public class ShiroConfig {
 		daapc.setProxyTargetClass(true);
 		return daapc;
 	}
+
+
 }

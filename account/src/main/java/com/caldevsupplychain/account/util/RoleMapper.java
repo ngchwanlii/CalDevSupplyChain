@@ -24,6 +24,6 @@ public abstract class RoleMapper {
 	}
 
 	// for reuse purpose
-	public abstract List<RoleName> toRoleNameList(List<Role> roles);
-	public abstract List<Role> toRoleList(List<RoleName> roleNames);
+	public abstract List<RoleName> toRoleNames(List<Role> roles);
+	public abstract List<Role> toRoles(List<RoleName> roleNames);
 }
