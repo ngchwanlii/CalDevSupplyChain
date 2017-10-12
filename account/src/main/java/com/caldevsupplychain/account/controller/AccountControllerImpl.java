@@ -120,7 +120,6 @@ public class AccountControllerImpl implements AccountController {
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.PERMISSION_DENIED_ON_ROLE_UPDATE.name(), "User cannot update role"), HttpStatus.BAD_REQUEST);
 		}
 
-
 		if(!subject.hasRole(RoleName.ADMIN.name()) && !userWS.getEmailAddress().equals(user.get().getEmailAddress())){
 			return new ResponseEntity<>(new ApiErrorsWS(ErrorCode.PERMISSION_DENIED_ON_EMAIL_UPDATE.name(), "User cannot update email address"), HttpStatus.BAD_REQUEST);
 		}
